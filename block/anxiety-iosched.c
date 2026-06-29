@@ -58,6 +58,9 @@ static uint16_t anxiety_dispatch_batch(struct request_queue *q)
 	uint16_t dispatched = 0;
 	int ret;
 
+	if (list_empty(&adata->sync_queue) && list_empty(&adata->async_queue))
+		return 0;
+
 	/* Perform each batch adata->batch_count many times */
 	for (i = 0; i < adata->batch_count; i++) {
 		/* Batch sync requests according to tunables */
