@@ -209,7 +209,8 @@ CONFIG_AIO=y
 CONFIG_ADVISE_SYSCALLS=y
 CONFIG_HAVE_ARCH_USERFAULTFD_MINOR=y
 CONFIG_MEMBARRIER=y
-# CONFIG_KALLSYMS is not set
+CONFIG_KALLSYMS=y
+CONFIG_KALLSYMS_ALL=y
 CONFIG_BPF_LSM=y
 CONFIG_BPF_SYSCALL=y
 CONFIG_ARCH_WANT_DEFAULT_BPF_JIT=y
@@ -5273,7 +5274,8 @@ CONFIG_QCOM_KGSL_RECLAIM=y
 # KernelSU
 #
 CONFIG_KSU=y
-CONFIG_KSU_TAMPER_SYSCALL_TABLE=y
+CONFIG_KSU_SUSFS=y
+
 #
 # File systems
 #
@@ -5370,7 +5372,7 @@ CONFIG_FAT_DEFAULT_IOCHARSET="iso8859-1"
 # CONFIG_FAT_DEFAULT_UTF8 is not set
 CONFIG_EXFAT_FS=y
 CONFIG_EXFAT_DEFAULT_IOCHARSET="utf8"
-# CONFIG_NTFS_FS is not set
+CONFIG_NTFS_FS=y
 
 #
 # Pseudo filesystems
@@ -5534,7 +5536,7 @@ CONFIG_INTEGRITY=y
 # CONFIG_EVM is not set
 CONFIG_DEFAULT_SECURITY_SELINUX=y
 # CONFIG_DEFAULT_SECURITY_DAC is not set
-CONFIG_LSM="lockdown,yama,loadpin,safesetid,integrity,selinux,smack,tomoyo,apparmor,bpf"
+CONFIG_LSM="lockdown,yama,loadpin,safesetid,integrity,selinux,smack,tomoyo,apparmor,bpf,baseband_guard"
 
 #
 # Kernel hardening options
