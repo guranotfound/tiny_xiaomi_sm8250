@@ -17,14 +17,16 @@ jobs:
       with:
         ref: lineage-tiny # Chạy đúng cái branch bác đã up lên
 
-    - name: 3. Tải và Setup bộ Toolchain Clang AOSP
+    - name: 3. Tải và Setup bộ Toolchain ZyC Clang 20+
       run: |
         mkdir -p $GITHUB_WORKSPACE/clang
-        # Kéo bản Clang chuẩn của Google về để compile không bị lỗi flag Qualcomm
         cd $GITHUB_WORKSPACE/clang
-        wget https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/main/clang-r450784d.tar.gz
-        tar -xf clang-r450784d.tar.gz
+        # Tải bản Clang 20 ổn định từ release của ZyCromerZ
+        https://github.com/ZyCromerZ/Clang/releases/download/23.0.0git-20260130-release/Clang-23.0.0git-20260130.tar.gz
+        tar -xf Clang-23.0.0git-20260130.tar.gz
+        rm Clang-23.0.0git-20260130.tar.gz
         echo "$GITHUB_WORKSPACE/clang/bin" >> $GITHUB_PATH
+        
 
     - name: 4. Tiến hành Compile Nhân Kernel
       run: |
@@ -32,11 +34,8 @@ jobs:
         export SUBARCH=arm64
         export HEADER_ARCH=arm64
         export O=out
-        
-        # Nạp defconfig gốc của chip
-        make O=out vendor/alioth_defconfig
-        
-        # Bắt đầu gầm rú cày cuốc (Ép cccache clang và LLVM)
+        make O=out alioth_defconfig
+        # Ép Clang và LLVM kết hợp hoàn toàn
         make O=out -j$(nproc) CC=clang LLVM=1 LLVM_IAS=1
         
     - name: 5. Đóng gói sản phẩm AnyKernel3 (Nếu cần) hoặc xuất file Image.gz
