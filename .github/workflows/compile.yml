@@ -17,6 +17,16 @@ jobs:
       with:
         ref: lineage-tiny # Chạy đúng cái branch bác đã up lên
 
+    - name: 2.5 Dọn sạch KernelSU cũ và nạp bản mới chuẩn chỉ
+      run: |
+        # 1. Xóa sạch sẽ các tàn dư hoặc thư mục ksu cũ nếu có để tránh xung đột
+        rm -rf drivers/kernelsu KernelSU
+        
+        # 2. Clone bản KernelSU mới (Bác có thể đổi link sang repo KSU bác muốn, ví dụ ReSukiSU)
+        curl -LSs "https://raw.githubusercontent.com/ReSukiSU/ReSukiSU/main/kernel/setup.sh" | bash
+        
+
+
     - name: 3. Tải và Setup bộ Toolchain ZyC Clang 20+
       run: |
         mkdir -p $GITHUB_WORKSPACE/clang
