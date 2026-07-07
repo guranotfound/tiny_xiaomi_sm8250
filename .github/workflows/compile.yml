@@ -1,0 +1,58 @@
+name: Build Custom Kernel CLO (sm8250)
+
+on:
+  workflow_dispatch: # Bật tính năng cho phép bác bấm nút "Run workflow" bằng tay trên web
+
+jobs:
+  kernel-compiler:
+    runs-on: ubuntu-latest
+    steps:
+    - name: 1. Cài đặt các Package hệ thống phụ trợ
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y bc bison build-essential ccache flex g++-multilib gcc-multilib git gnupg gperf lib32ncurses5-dev lib32readline6-dev lib32z1-dev liblz4-tool libncurses5 libncurses5-dev libsdl1.2-dev libssl-dev libxml2 libxml2-utils lzop pngcrush rsync schedtool squashfs-tools xsltproc zip zlib1g-dev
+
+    - name: 2. Kéo Source Code của bác về máy ảo
+      uses: actions/checkout@v4
+      with:
+        ref: lineage-tiny # Chạy đúng cái branch bác đã up lên
+
+    - name: 3. Tải và Setup bộ Toolchain Clang AOSP
+      run: |
+        mkdir -p $GITHUB_WORKSPACE/clang
+        # Kéo bản Clang chuẩn của Google về để compile không bị lỗi flag Qualcomm
+        cd $GITHUB_WORKSPACE/clang
+        wget https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/main/clang-r450784d.tar.gz
+        tar -xf clang-r450784d.tar.gz
+        echo "$GITHUB_WORKSPACE/clang/bin" >> $GITHUB_PATH
+
+    - name: 4. Tiến hành Compile Nhân Kernel
+      run: |
+        export ARCH=arm64
+        export SUBARCH=arm64
+        export HEADER_ARCH=arm64
+        export O=out
+        
+        # Nạp defconfig gốc của chip
+        make O=out vendor/alioth_defconfig
+        
+        # Bắt đầu gầm rú cày cuốc (Ép cccache clang và LLVM)
+        make O=out -j$(nproc) CC=clang LLVM=1 LLVM_IAS=1
+        
+    - name: 5. Đóng gói sản phẩm AnyKernel3 (Nếu cần) hoặc xuất file Image.gz
+      run: |
+        mkdir -p $GITHUB_WORKSPACE/artifact
+        if [ -f "out/arch/arm64/boot/Image.gz" ]; then
+          cp out/arch/arm64/boot/Image.gz $GITHUB_WORKSPACE/artifact/
+          echo "==> Build thành công rực rỡ!"
+        else
+          echo "==> Lỗi rồi, không tìm thấy Image.gz!"
+          exit 1
+        fi
+
+    - name: 6. Up hàng lên GitHub cho bác tải về máy
+      uses: actions/upload-artifact@v4
+      with:
+        name: Custom-Kernel-Alioth
+        path: ${{ github.workspace }}/artifact/*
+        
