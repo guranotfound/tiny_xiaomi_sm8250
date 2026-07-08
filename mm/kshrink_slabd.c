@@ -30,10 +30,6 @@ struct async_slabd_parameter {
 	int priority;
 } asp;
 
-static struct reclaim_state async_reclaim_state = {
-		.reclaimed_slab = 0,
-};
-
 static bool is_shrink_slabd_task(struct task_struct *tsk)
 {
 	return tsk->pid == kshrink_slabd_pid;
@@ -47,7 +43,6 @@ bool wakeup_shrink_slabd(gfp_t gfp_mask, int nid,
 			(asp.shrink_slabd_runnable == 1))
 		return false;
 
-	current->reclaim_state = &async_reclaim_state;
 	asp.shrink_slabd_gfp_mask = gfp_mask;
 	asp.shrink_slabd_nid = nid;
 	asp.shrink_slabd_memcg = memcg;
@@ -114,7 +109,6 @@ static int kshrink_slabd_func(void *p)
 	current->flags |= PF_MEMALLOC | PF_SWAPWRITE | PF_KSWAPD;
 	set_freezable();
 
-	current->reclaim_state = &async_reclaim_state;
 	asp.shrink_slabd_gfp_mask = 0;
 	asp.shrink_slabd_nid = 0;
 	asp.shrink_slabd_memcg = NULL;
@@ -137,7 +131,6 @@ static int kshrink_slabd_func(void *p)
 		asp.shrink_slabd_runnable = 0;
 	}
 	current->flags &= ~(PF_MEMALLOC | PF_SWAPWRITE | PF_KSWAPD);
-	current->reclaim_state = NULL;
 
 	return 0;
 }
