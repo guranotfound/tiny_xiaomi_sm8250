@@ -732,11 +732,9 @@ unsigned long shrink_slab(gfp_t gfp_mask, int nid,
 {
 	unsigned long ret, freed = 0;
 	struct shrinker *shrinker;
-	bool bypass = false;
+	bool bypass __maybe_unused = false;
 
-        should_shrink_async(gfp_mask, nid, memcg, priority, &bypass);
-	if (bypass)
-		return 0;
+    #define should_shrink_async(gfp_mask, nid, memcg, priority, bypass) (*(bypass) = 0)
 
 	/*
 	 * The root memcg might be allocated even though memcg is disabled
