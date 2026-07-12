@@ -162,9 +162,7 @@ static void w2le(uint16_t val, uint16_t *x)
 static uint64_t (*r8)(const uint64_t *);
 static uint32_t (*r)(const uint32_t *);
 static uint16_t (*r2)(const uint16_t *);
-static void (*w8)(uint64_t, uint64_t *);
 static void (*w)(uint32_t, uint32_t *);
-static void (*w2)(uint16_t, uint16_t *);
 
 typedef void (*table_sort_t)(char *, int);
 
@@ -282,16 +280,12 @@ do_file(char const *const fname)
 		r2 = r2le;
 		r8 = r8le;
 		w = wle;
-		w2 = w2le;
-		w8 = w8le;
 		break;
 	case ELFDATA2MSB:
 		r = rbe;
 		r2 = r2be;
 		r8 = r8be;
 		w = wbe;
-		w2 = w2be;
-		w8 = w8be;
 		break;
 	}  /* end switch */
 	if (memcmp(ELFMAG, ehdr->e_ident, SELFMAG) != 0
